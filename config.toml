@@ -1,7 +1,7 @@
 baseurl = "/"
 languageCode = "en-us"
 title = "The Atomic Vector"
-theme = "hugo-lithium"
+theme = "hyde-hyde"
 googleAnalytics = ""
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
@@ -17,7 +17,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     url = "https://github.com/bassengd"
 
 [params]
-    description = "The Atomic Vector: Blogging about using R in the NHS"
+    description = "Blogging about using R in the NHS"
 
     # options for highlight.js (version, additional languages, and theme)
     highlightjsVersion = "9.12.0"

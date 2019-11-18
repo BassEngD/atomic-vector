@@ -14,13 +14,10 @@ tags:
 
 
 
-<p>Dedicated servers don’t just cost money; they require IT infrastructure and the support of our IT overlords. Getting either of these things has always been difficult, but if you want to just test out something on a whim, you haven’t got a chance. There are procedures and forms and processes to go through even if you just want a desktop PC that runs an odd version of Windows. Need a Linux based computer to run Shiny Server to test out a few apps? Not happening.</p>
-<div id="building-a-server" class="section level3">
-<h3>Building A Server</h3>
-<p>We can get around these requirements for small scale tests using virtual machines, or VMs. A VM is a program you can run on a normal, everyday computer that pretends to be an entirely different computer. So instead of a dedicated server running a different OS on different hardware, you can just set up a VM to run on your office PC. It can run Linux and act as a server while you carry on making spreadsheets in Windows <del>XP78</del>10.</p>
+<p>Dedicated servers don’t just cost money; they require IT infrastructure and the support of our IT overlords. Need a Linux based computer to run Shiny Server? Try a virtual machine (VM) instead.</p>
+<p>A VM is a program you can run on a normal, everyday computer that pretends to be an entirely different computer. So instead of a dedicated server running a different OS on different hardware, you can just set up a VM to run on your office PC. It can run Linux and act as a server while you carry on making spreadsheets in Windows <del>XP78</del>10.</p>
 <p>The VM can also communicate with other computers over the network, if you configure it to do so. In my adventures so far I have used port forwarding to let other computers on the network send requests to my computer, which then passes the requests on to the VM and sends the replies back. It may not work on every network, but hey, it’s worth a try.</p>
 <p>The downside to all of this is that the VM is not as fast as a dedicated computer and it will use a portion of the host computer’s RAM and CPU, slowing it down as well.</p>
-</div>
 <div id="the-virtual-tools" class="section level3">
 <h3>The (Virtual) Tools</h3>
 <p>There are a lot of options available for creating VMs and servers. What you pick will depend on what you want to use the VM for. This article recounts what I did to create a Shiny Server using:</p>

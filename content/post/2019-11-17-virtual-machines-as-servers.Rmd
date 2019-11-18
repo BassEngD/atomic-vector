@@ -12,11 +12,9 @@ tags:
   - virtual machine
 ---
 
-Dedicated servers don't just cost money; they require IT infrastructure and the support of our IT overlords. Getting either of these things has always been difficult, but if you want to just test out something on a whim, you haven't got a chance. There are procedures and forms and processes to go through even if you just want a desktop PC that runs an odd version of Windows. Need a Linux based computer to run Shiny Server to test out a few apps? Not happening.
+Dedicated servers don't just cost money; they require IT infrastructure and the support of our IT overlords. Need a Linux based computer to run Shiny Server? Try a virtual machine (VM) instead.
 
-### Building A Server
-
-We can get around these requirements for small scale tests using virtual machines, or VMs. A VM is a program you can run on a normal, everyday computer that pretends to be an entirely different computer. So instead of a dedicated server running a different OS on different hardware, you can just set up a VM to run on your office PC. It can run Linux and act as a server while you carry on making spreadsheets in Windows ~~XP~~~~7~~~~8~~10.
+A VM is a program you can run on a normal, everyday computer that pretends to be an entirely different computer. So instead of a dedicated server running a different OS on different hardware, you can just set up a VM to run on your office PC. It can run Linux and act as a server while you carry on making spreadsheets in Windows ~~XP~~~~7~~~~8~~10.
 
 The VM can also communicate with other computers over the network, if you configure it to do so. In my adventures so far I have used port forwarding to let other computers on the network send requests to my computer, which then passes the requests on to the VM and sends the replies back. It may not work on every network, but hey, it's worth a try.
 
