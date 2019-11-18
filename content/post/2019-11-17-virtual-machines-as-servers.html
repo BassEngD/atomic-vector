@@ -115,4 +115,9 @@ To make my life easier, I also added my own user name to the <code>shiny</code> 
 <p>The shiny server default screen should now be accessible to other systems by opening a web browser and entering the url:
 <code>//your_computer_name_or_ip_address:3838</code></p>
 </div>
+<div id="file-transfers" class="section level3">
+<h3>File Transfers</h3>
+<p>I’m not totally sure how files can be passed between the VM and the host machine. The method that has worked for me (with some hiccups) is to create a shared folder between the two. Open the VM’s options and go to <code>Shared Folders</code>, then add a new one. I ticked the ‘auto-mount’ option so that the folder would be available whenever I rebooted the VM. The folder should now appear on the VM desktop.</p>
+<p>When I try to access the folder I have to enter my password at least 2 times, sometimes more. I have not looked into this issue yet. Files that are put into the folder can indeed be seen by both the host system and the VM. This is pretty cool, considering the host is a Windows system and the VM is using Linux. I used this system to copy across an installation file for R-Studio and it worked.</p>
+</div>
 </div>
