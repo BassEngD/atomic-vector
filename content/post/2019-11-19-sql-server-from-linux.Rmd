@@ -1,0 +1,65 @@
+---
+title: SQL Server from Linux
+author: Matthew Bass
+date: '2019-11-19'
+slug: sql-server-from-linux
+categories: []
+tags:
+  - linux
+  - sql
+lastmod: '2019-11-19T10:34:47Z'
+layout: post
+type: post
+highlight: no
+---
+
+Microsoft SQL Server is used widely in the NHS and can use Windows Authentication to control database access. This can be convenient, but it raises the question of what to do with systems using Linux. This post gives some details about how I was able to access our SQL server from my Shiny Server VM, and some of the problems I faced along the way.
+
+## ODBC and Drivers
+
+I use ODBC to send queries and get results from our SQL server when using R. The R code to setup a SQL connection in Windows looks something like this:
+
+```{r example_sql, eval = FALSE, echo = TRUE}
+
+SQLconnection <- dbConnect(odbc(),
+                             driver = "SQL Server",
+                             server="my_SQL_server",
+                             database="my_database"
+                           )
+```
+
+This does not work if R is running on a Linux system because the driver "SQL server" is not installed. The official Microsoft SQL driver for Linux can be downloaded from [here](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15). But do not be fooled; this will not solve your Linux problems if you need to use Windows Authentication to log in to your server.
+
+Instead of the MS driver, I found I had to use the [FreeTDS](https://www.freetds.org/) libraries.
+
+## Installing FreeTDS in Ubuntu
+
+The first step was to install FreeTDS and the odbc tools with the following command:
+
+`sudo apt install unixodbc unixodbc-dev freetds-dev freetds-bin tdsodbc`
+
+Next we tell odbc to use the FreeTDS driver by editing the file `etc/odbcinst.ini` to include the lines:
+
+```{r odbcinst_config, eval=FALSE, echo = TRUE}
+[FreeTDS]
+Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so
+```
+
+## Using FreeTDS in R
+
+Now when you use `dbConnect` in R you give the driver as "FreeTDS" instead of the MS SQL driver and provide the argument `TDS_Version`. For example:
+
+```{r example_sql_2, eval = FALSE, echo = TRUE}
+SQLconnection <- dbConnect(odbc()
+                          , driver = "FreeTDS"
+                          , server = "my_SQL_server"
+                          , database = "my_database"
+                          , port = 1433 # The default port for SQL Server. You may use a different one.
+                          , UID = "your_domain\\your_username"
+                          , PWD = "your_password"
+                          , TDS_Version = "7.3" # This number changes depending on your SQL Server version. See https://www.freetds.org/userguide/choosingtdsprotocol.htm for details
+)
+```
+
+And that should work now. I'm not a fan of putting the username and password in plain text, but fixing that is a problem for another time.
+Some guides mention that you can put the password and user name in "DSN files", but when I tried to do this it simply ignored them. I think that for MS SQL it will not allow you to use a DSN file and it requires that you include the password and user name in the connection string. I'm not sure about this though.
