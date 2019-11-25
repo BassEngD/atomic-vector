@@ -38,7 +38,7 @@ Put the OS installation .iso file in here and then start the machine to begin in
 
 ## Getting Online - Configure Proxies
 
-The VM will need to update things and download software from online repositories. So the first step after the OS is installed is to configure the VM to use your trust's proxy server. I can't tell you what this will be for each network, but it might be called something like `XYZproxy`, were XYZ is your trust's intitials. Go to the Network Settings panel shown below. This can be accessed by opening the `Settings` application, found by pressing the `Show applications` button in the bottom left of the screen.
+The VM will need to update things and download software from online repositories. So the first step after the OS is installed is to configure the VM to use your trust's proxy server. Go to the Network Settings panel shown below. This can be accessed by opening the `Settings` application, found by pressing the `Show applications` button in the bottom left of the screen.
 
 ![](/post/2019-11-17-virtual-machines-as-servers_files/Ubuntu_Network_Settings_Panel.PNG){width=75%}
 
@@ -102,7 +102,7 @@ I am using Ubuntu LTS 18.04, also known as Bionic-Beaver, so the CRAN repository
 
 `sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'`
 
-If you use a different version of Ubuntu then [head here](https://cran.r-project.org/bin/linux/ubuntu/README.html) to find out which repo you need to aim apt-get at.
+If you use a different version of Ubuntu then [head here](https://cran.r-project.org/bin/linux/ubuntu/README.html) to find out which repo you need to aim apt at.
 
 After the repo is added we must update apt again to download the repository indexes.
 
