@@ -35,7 +35,7 @@ tags:
 </div>
 <div id="getting-online---configure-proxies" class="section level2">
 <h2>Getting Online - Configure Proxies</h2>
-<p>The VM will need to update things and download software from online repositories. So the first step after the OS is installed is to configure the VM to use your trust’s proxy server. I can’t tell you what this will be for each network, but it might be called something like <code>XYZproxy</code>, were XYZ is your trust’s intitials. Go to the Network Settings panel shown below. This can be accessed by opening the <code>Settings</code> application, found by pressing the <code>Show applications</code> button in the bottom left of the screen.</p>
+<p>The VM will need to update things and download software from online repositories. So the first step after the OS is installed is to configure the VM to use your trust’s proxy server. Go to the Network Settings panel shown below. This can be accessed by opening the <code>Settings</code> application, found by pressing the <code>Show applications</code> button in the bottom left of the screen.</p>
 <p><img src="/post/2019-11-17-virtual-machines-as-servers_files/Ubuntu_Network_Settings_Panel.PNG" style="width:75.0%" /></p>
 <p>Change the Network Proxy option to <strong>Manual</strong></p>
 <p>The HTTP and HTTPS proxies can then be set to <code>your_username:your_password@your_proxy</code> and the port number set to the relevent number.</p>
@@ -75,7 +75,7 @@ Before you restart it, set up the shared clipboard by clicking on <code>Settings
 <p>Aren’t you glad we made copy/paste work?</p>
 <p>I am using Ubuntu LTS 18.04, also known as Bionic-Beaver, so the CRAN repository I need is added with</p>
 <p><code>sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/'</code></p>
-<p>If you use a different version of Ubuntu then <a href="https://cran.r-project.org/bin/linux/ubuntu/README.html">head here</a> to find out which repo you need to aim apt-get at.</p>
+<p>If you use a different version of Ubuntu then <a href="https://cran.r-project.org/bin/linux/ubuntu/README.html">head here</a> to find out which repo you need to aim apt at.</p>
 <p>After the repo is added we must update apt again to download the repository indexes.</p>
 <p><code>sudo apt update</code></p>
 <p><code>sudo apt install r-base</code></p>

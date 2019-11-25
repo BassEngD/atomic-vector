@@ -15,23 +15,23 @@ highlight: no
 
 
 
-<p>Microsoft SQL Server is used widely in the NHS and can use Windows Authenticaton to control database access. This can be convinient, but it raises the question of what to do with systems using Linux. This post gives some details about how I was able to access our SQL server from my Shiny Server VM, and some of the problems I faced along the way.</p>
+<p>Microsoft SQL Server is used widely in the NHS and can use Windows Authentication to control database access. This can be convenient, but it raises the question of what to do with systems using Linux. This post gives some details about how I was able to access our SQL server from my Shiny Server VM, and some of the problems I faced along the way.</p>
 <div id="odbc-and-drivers" class="section level2">
 <h2>ODBC and Drivers</h2>
-<p>I use odbc to send queries and get results from our SQL server when using R. The R code to setup a SQL connection in Windows looks something like this:</p>
+<p>I use ODBC to send queries and get results from our SQL server when using R. The R code to setup a SQL connection in Windows looks something like this:</p>
 <pre class="r"><code>SQLconnection &lt;- dbConnect(odbc(),
                              driver = &quot;SQL Server&quot;,
                              server=&quot;my_SQL_server&quot;,
                              database=&quot;my_database&quot;
                            )</code></pre>
-<p>This does not work if R is running on a Linux system because the driver “SQL server” is not installed. The official Microsoft SQL driver for linux can be downloaded from <a href="https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15">here</a>. But do not be fooled; this will not solve your linux problems if you need to use Windows Authentication to log in to your server.</p>
+<p>This does not work if R is running on a Linux system because the driver “SQL server” is not installed. The official Microsoft SQL driver for Linux can be downloaded from <a href="https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver15">here</a>. But do not be fooled; this will not solve your Linux problems if you need to use Windows Authentication to log in to your server.</p>
 <p>Instead of the MS driver, I found I had to use the <a href="https://www.freetds.org/">FreeTDS</a> libraries.</p>
 </div>
 <div id="installing-freetds-in-ubuntu" class="section level2">
 <h2>Installing FreeTDS in Ubuntu</h2>
 <p>The first step was to install FreeTDS and the odbc tools with the following command:</p>
 <p><code>sudo apt install unixodbc unixodbc-dev freetds-dev freetds-bin tdsodbc</code></p>
-<p>Next we tell odbc to use the FreeTDS driver by editting the file <code>etc/odbcinst.ini</code> to include the lines:</p>
+<p>Next we tell odbc to use the FreeTDS driver by editing the file <code>etc/odbcinst.ini</code> to include the lines:</p>
 <pre class="r"><code>[FreeTDS]
 Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so</code></pre>
 </div>
@@ -47,5 +47,6 @@ Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so</code></pre>
                           , PWD = &quot;your_password&quot;
                           , TDS_Version = &quot;7.3&quot; # This number changes depending on your SQL Server version. See https://www.freetds.org/userguide/choosingtdsprotocol.htm for details
 )</code></pre>
-<p>And that should work now. I’m not a fan of putting the username and password in plain text, but fixing that is a problem for another time.</p>
+<p>And that should work now. I’m not a fan of putting the username and password in plain text, but fixing that is a problem for another time.
+Some guides mention that you can put the password and user name in “DSN files”, but when I tried to do this it simply ignored them. I think that for MS SQL it will not allow you to use a DSN file and it requires that you include the password and user name in the connection string. I’m not sure about this though.</p>
 </div>
