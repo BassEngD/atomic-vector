@@ -1,0 +1,111 @@
+---
+title: Sparse Matrix Magic
+author: Matthew Bass
+date: '2020-21-10'
+slug: sparse-matrix-magic
+categories:
+  - R
+tags:
+  - matrix
+  - modelling
+  - memory
+layout: post
+type: post
+highlight: no
+---
+
+One of the hardest parts of using R with large datasets is fitting them into RAM. R needs to keep all the data it is working with in memory and you can quickly fill up a few GB with only a couple of big models. This post will talk about using the sparse matrix class from the Matrix package to improve memory use, and when you might be able to do it.
+
+## How R Uses Matrices
+
+You are using matrices whenever R builds a model, such as a linear regression. The most common way to build models is by preparing data in a data.frame, a model formula and then using them in a modelling function. For example, we can build the simple linear model below. This will give us the model object, _cars_lm_. This is a list containing all kinds of vectors and values that can be used by functions like _predict()_ and _summary()_ to tell us the results of the model.
+
+```{r lm_example}
+#Load an example dataset into a data.frame
+cars_data <- mtcars
+
+# This formula will look for how the cyl, disp, hp and wt columns relate to mpg.
+cars_formula <- "mpg ~ cyl + disp + hp + wt"
+
+# Create the model with the linear model (lm) function
+cars_lm <- lm(formula = cars_formula, data = cars_data)
+
+summary(cars_lm)
+```
+
+What this code conceals is how R calculates the model using a _model matrix_. One of the first steps that _lm()_ will perform is to use the model formula and the data to create the model matrix; a way of representing all of the variables that need to be fitted. R allows us to do the same thing ourselves with the function model.matrix().
+The model matrix is then used as an input to the function _lm.fit()_, which is the function that does the hard work of figuring out the coefficients to use in the model.
+
+```{r lm_fit_example}
+cars_model_matrix <- model.matrix(as.formula(cars_formula), cars_data)
+
+head(cars_model_matrix)
+
+cars_lm_fit <- lm.fit(x = cars_model_matrix, y = cars_data[["mpg"]])
+
+summary(cars_lm_fit)
+```
+
+The output of _lm.fit()_ is not the same as _lm()_. It does not have the class attribute "lm", so the summary function will simply treat _cars_lm_fit_ as a generic list. The list still contains the coefficients that are needed to fit the model and predict values for new data, it just wont work with functions that expect an lm object.
+
+## The Sparse Matrix
+
+The model matrix we created above is not sparse. It contains values in all of its rows and columns and they are all needed to build the model. Other models do not behave as nicely as this. If the data includes a categorical variable, that is one which has different 'levels', it will make a very different model matrix. As an example we will add a categorical variable to the cars data called _type_ with the possible levels of "class a", "class b" and "class c". This is then added to the formula and fitted against.
+
+```{r add_factor}
+cars_data[["type"]] <- factor(x = c("class a", "class a", "class b", "class c", "class b",
+                                    "class a", "class a", "class b", "class c", "class b",
+                                    "class a", "class a", "class b", "class c", "class b",
+                                    "class a", "class a", "class b", "class c", "class b",
+                                    "class a", "class a", "class b", "class c", "class b",
+                                    "class a", "class a", "class b", "class c", "class b",
+                                    "class a", "class a"
+                                    )
+                              , levels = c("class a", "class b", "class c")
+                              )
+
+cars_formula_type <- "mpg ~ cyl + disp + hp + wt + type"
+
+# Create the model with the linear model (lm) function
+cars_lm_type <- lm(formula = cars_formula_type, data = cars_data)
+summary(cars_lm_type)
+```
+
+The type is fitted as if it were 2 variables; 'typeclass b' and 'typeclass c'. The model assumes that 'class a' is the default and does not require its own coefficient. This behavior is based on the order of the factor levels, it will always use the first level.
+
+We can see what this does to the model matrix below.
+
+```{r lm_fit_factors}
+cars_model_matrix_type <- model.matrix(as.formula(cars_formula_type), cars_data)
+
+head(cars_model_matrix_type)
+
+cars_lm_fit_type <- lm.fit(x = cars_model_matrix_type, y = cars_data[["mpg"]])
+
+summary(cars_lm_fit_type)
+```
+
+The model matrix now includes two extra columns; 'typeclass b' and 'typeclass c'. These are 1 if `type` is class b or class c respectively, and only one of them can be anything other than 0 in a row.
+
+If a variable has a _single_ variable with 50 factors it will add 49 columns to the model matrix. In each row, only a single column will be 1 and all of the others will be 0. The default matrix in R takes just as much memory to record a 1, a 0 or any other reasonably small integer. The amount of RAM it takes to hold and manipulate the matrix increases rapidly, just by including different factors.
+
+A __sparse matrix__ from the Matrix package does not suffer from this problem. It does not record any cell with a value of 0. Instead, it records the location and values of all non-zero values. This extra overhead means that it will be larger than a non-sparse matrix if it is used to store a matrix that is full of data. For a matrix absolutely stuffed with 0's, though, it can make a matrix that takes 1 GB of RAM fit into a couple of MB. Perfect for models dealing with lots of factors.
+
+## Using Sparse Matrix in Models
+
+In a perfect world the function you are using to build your model will have an argument like `sparse=TRUE` to tell the model to use a sparse model matrix. Check the documentation for the function to see if it talks about it.
+
+If your function doesn't include built-in support for a sparse matrix you may be able to force it to use them. Look for a function ending in _.fit_ like `lm.fit`, since this is commonly the function that will be acting on the model matrix. If this is available then you can create a sparse model matrix yourself using the `sparse.model.matrix` function and use it as the input to the fitting function. However, it is not garanteed to work.
+
+```{r use_sparse_1, message = FALSE, error=TRUE}
+library(Matrix)
+cars_model_matrix_type <- sparse.model.matrix(as.formula(cars_formula_type), cars_data)
+head(cars_model_matrix_type)
+
+cars_lm_fit_type <- lm.fit(x = cars_model_matrix_type, y = cars_data[["mpg"]])
+
+```
+
+This example failed because lm.fit does not accept sparse matrices as inputs. There are other packages, such as `SparseM` that include this capability. Try searching CRAN and Google for your modelling function and "sparse matrix" and you may be in luck.
+
+A sparse matrix is not always going to use less memory than the default, but remember it the next time you work with factors.
